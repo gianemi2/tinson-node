@@ -7,7 +7,7 @@ export default class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'marco',
+            username: 'marco',
             password: 'marco',
             loggedIn: false
         };
@@ -27,7 +27,7 @@ export default class LoginForm extends Component {
                 <form onSubmit={this.handleSubmit} >
                     <label>
                         Name:
-                    <input type="text" name="username" value={this.state.name} onChange={this.handleChange} />
+                    <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
                     </label>
                     <label>
                         Password:
@@ -56,11 +56,13 @@ export default class LoginForm extends Component {
     }
 
     async tryLoginUser() {
-        const { name, password } = this.state;
-        const data = await loginUser(name, password);
+        const { username, password } = this.state;
+        const data = await loginUser(username, password);
         if (data.success) {
             sessionStorage.setItem('_id', data._id);
             this.setState({ loggedIn: true })
+        } else {
+            alert(data.message);
         }
     }
 }

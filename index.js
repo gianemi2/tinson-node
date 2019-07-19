@@ -54,7 +54,7 @@ app.post('/api/add-game', (req, res) => {
             return;
         }
         const gameList = JSON.parse(data);
-        const game = `https://docs.google.com/uc?export=download&id=${req.body.gid}#${req.body.gname}`;
+        const game = `https://docs.google.com/uc?export=download&id=${req.body.gid}#${req.body.gname}.nsp`;
         gameList.files.push(game);
         const gameListJSON = JSON.stringify(gameList);
         fs.writeFile(filePath, gameListJSON, (err, result) => {
