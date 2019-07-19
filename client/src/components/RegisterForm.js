@@ -6,7 +6,12 @@ import { registerUser } from '../api'
 export default class RegisterForm extends Component {
     constructor(props) {
         super(props);
-        this.state = { name: 'marco', password: 'marco', rePassword: 'marco', registered: false };
+        this.state = {
+            name: 'marco',
+            password: 'marco',
+            rePassword: 'marco',
+            registered: false
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
