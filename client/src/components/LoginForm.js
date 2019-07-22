@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link as RouterLink } from 'react-router-dom'
+import { TextField, Typography, Button, Link, FormControl, Grid } from '@material-ui/core'
 
 import { loginUser } from '../api'
 
@@ -7,8 +8,8 @@ export default class LoginForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: 'marco',
-            password: 'marco',
+            username: '',
+            password: '',
             loggedIn: false
         };
 
@@ -16,25 +17,49 @@ export default class LoginForm extends Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentWillMount() {
-        // Check session storage
-    }
-
     render() {
         return (
             <React.Fragment>
                 {this.renderRedirect()}
-                <form onSubmit={this.handleSubmit} >
-                    <label>
-                        Name:
-                    <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
-                    </label>
-                    <label>
-                        Password:
-                    <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
-                    </label>
-                    <input type="submit" value="Submit" />
+                <Typography variant="h3" gutterBottom>
+                    Login
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                    Use your credentials to login.
+                </Typography>
+                <form onSubmit={this.handleSubmit}>
+                    <Grid
+                        container
+                        justify="flex-start"
+                        alignItems="flex-end"
+                    >
+                        <FormControl style={{ marginRight: 10 }}>
+                            <TextField
+                                name="username"
+                                label="Insert your username"
+                                placeholder="Username"
+                                value={this.state.username}
+                                onChange={this.handleChange}
+                                margin="normal"
+                                aria-describedBy="my-helper-text"
+                            />
+                        </FormControl>
+                        <FormControl style={{ marginRight: 10 }}>
+                            <TextField
+                                name="password"
+                                label="Insert your password"
+                                placeholder="Password"
+                                value={this.state.password}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
+                        </FormControl>
+                        <Button type="submit" style={{ marginBottom: 8 }} variant="contained" color="primary">Login</Button>
+                    </Grid>
                 </form >
+                <Typography variant="body1" gutterBottom>
+                    Are you new to Tinson? <Link component={RouterLink} color="inherit" variant="inherit" to="/register">Register now.</Link>
+                </Typography>
             </React.Fragment >
 
         )

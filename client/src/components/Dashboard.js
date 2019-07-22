@@ -21,7 +21,7 @@ export default class Dashboard extends Component {
                 {this.redirectIfNotLoggedIn()}
                 <Informations></Informations>
                 <AddGame onGameUpdated={this.fetchGames}></AddGame>
-                <GameList onTriggerDelete={(index) => this.deleteGame(index)} games={this.state.games}></GameList>
+                <GameList onTriggerDelete={(index) => this.deleteGames(index)} games={this.state.games}></GameList>
             </React.Fragment>
         )
     }
@@ -39,7 +39,8 @@ export default class Dashboard extends Component {
         }
     }
 
-    deleteGame = async (index) => {
+    deleteGames = async (index) => {
+        console.log('Sending ', index);
         const response = await deleteGameFromList(index);
         if (response.success) {
             this.fetchGames();

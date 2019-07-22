@@ -79,13 +79,14 @@ app.get('/api/gamelist', (req, res) => {
 
 app.post('/api/gamelist', (req, res) => {
     const target = req.body.index;
+    console.log(target);
     const filePath = `json/${req.headers.authorization}.json`;
     fs.readFile(filePath, 'utf8', function (err, data) {
         if (err) {
             res.json({ success: false, message: 'user not found', error: err });
         } else {
             let gamelist = JSON.parse(data);
-            gamelist.files.splice(target, 1);
+            gamelist.files = gamelist.files.filter((v, i) => !target.includes(i));
             gamelist = JSON.stringify(gamelist);
             fs.writeFile(filePath, gamelist, (err) => {
                 if (err) {
