@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
+import { Redirect, Link as RouterLink } from 'react-router-dom'
+import { Typography, Grid, FormControl, TextField, Button, Link } from '@material-ui/core'
 
 import { registerUser } from '../api'
 
@@ -7,9 +8,8 @@ export default class RegisterForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'marco',
-            password: 'marco',
-            rePassword: 'marco',
+            name: '',
+            password: '',
             registered: false
         };
 
@@ -21,21 +21,45 @@ export default class RegisterForm extends Component {
         return (
             <React.Fragment>
                 {this.renderRedirect()}
+                <Typography variant="h3" gutterBottom>
+                    Register to Tinson
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                    Please, fill up the registration form for start using Tinson.
+                </Typography>
                 <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Name:
-                    <input type="text" name="name" value={this.state.name} onChange={this.handleChange} />
-                    </label>
-                    <label>
-                        Password:
-                    <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
-                    </label>
-                    <label>
-                        Password again:
-                    <input type="password" name="rePassword" value={this.state.rePassword} onChange={this.handleChange} />
-                    </label>
-                    <input type="submit" value="Submit" />
+                    <Grid
+                        container
+                        justify="flex-start"
+                        alignItems="flex-end"
+                    >
+                        <FormControl style={{ marginRight: 10 }}>
+                            <TextField
+                                name="name"
+                                label="Insert your username"
+                                placeholder="Username"
+                                value={this.state.name}
+                                onChange={this.handleChange}
+                                margin="normal"
+                                aria-describedBy="my-helper-text"
+                            />
+                        </FormControl>
+                        <FormControl style={{ marginRight: 10 }}>
+                            <TextField
+                                name="password"
+                                label="Insert your password"
+                                placeholder="Password"
+                                value={this.state.password}
+                                onChange={this.handleChange}
+                                margin="normal"
+                            />
+                        </FormControl>
+                        <Button type="submit" style={{ marginBottom: 8 }} variant="contained" color="primary">Register</Button>
+                    </Grid>
                 </form>
+                <Typography variant="body1" gutterBottom>
+                    Have you created an account before? <Link component={RouterLink} color="inherit" variant="inherit" to="/login">Login back!</Link>
+                </Typography>
             </React.Fragment>
         )
     }
@@ -47,13 +71,9 @@ export default class RegisterForm extends Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        const { name, password, rePassword } = this.state;
-        if (name && password && rePassword) {
-            if (password === rePassword) {
-                this.tryRegisterUser();
-            } else {
-                alert('Password must be the same!');
-            }
+        const { name, password } = this.state;
+        if (name && password) {
+            this.tryRegisterUser();
         } else {
             alert('All fields must be compiled!');
         }

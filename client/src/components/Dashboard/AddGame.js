@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Grid, FormControl, TextField, Button } from '@material-ui/core'
 
 import { addGameToList } from '../../api'
 
@@ -6,7 +7,7 @@ export default class AddGame extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            gameLink: 'https://drive.google.com/file/d/1cAJIjdVpznjXtGG4McVts-xnaZxFqbRh/view?usp=drivesdk',
+            gameLink: '',
             gameName: ''
         }
     }
@@ -20,6 +21,10 @@ export default class AddGame extends Component {
             let id = this.grepDriveId(this.state.gameLink);
             const data = await addGameToList(id, this.state.gameName);
             if (data.success) {
+                this.setState({
+                    gameLink: '',
+                    gameName: ''
+                })
                 this.props.onGameUpdated();
             }
         }
@@ -44,15 +49,33 @@ export default class AddGame extends Component {
     render() {
         return (
             <form onSubmit={this.handleSubmit}>
-                <label>
-                    Google drive link:
-                    <input type="url" name="gameLink" value={this.state.gameLink} onChange={this.handleChange} />
-                </label><br />
-                <label>
-                    Game name:
-                    <input type="text" name="gameName" value={this.state.gameName} onChange={this.handleChange} />
-                </label><br />
-                <input type="submit" value="Submit" />
+                <Grid
+                    container
+                    justify="flex-start"
+                    alignItems="flex-end"
+                >
+                    <FormControl style={{ marginRight: 10 }}>
+                        <TextField
+                            name="gameLink"
+                            label="Google Drive link"
+                            value={this.state.gameLink}
+                            onChange={this.handleChange}
+                            margin="normal"
+                            aria-describedBy="my-helper-text"
+                            type="url"
+                        />
+                    </FormControl>
+                    <FormControl style={{ marginRight: 10 }}>
+                        <TextField
+                            name="gameName"
+                            label="Google Drive name"
+                            value={this.state.gameName}
+                            onChange={this.handleChange}
+                            margin="normal"
+                        />
+                    </FormControl>
+                    <Button type="submit" style={{ marginBottom: 8 }} variant="contained" color="primary">Add game to list</Button>
+                </Grid>
             </form>
         )
     }
