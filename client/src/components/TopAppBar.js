@@ -13,17 +13,6 @@ class TopAppBar extends React.Component {
         }
     }
 
-    async componentDidUpdate(prevProps) {
-        if (this.props.location.pathname !== prevProps.location.pathname) {
-            const data = await userExists();
-            if (data.success) {
-                this.setState({ loggedin: true });
-            } else {
-                this.setState({ loggedin: false });
-            }
-        }
-    }
-
     render() {
         let button;
         if (!this.state.loggedin) {
@@ -63,12 +52,27 @@ class TopAppBar extends React.Component {
         );
     }
 
-    async componentDidMount() {
-        const data = await userExists();
-        if (data.success) {
-            this.setState({ loggedin: true });
+    async handleStatus() {
+        if (!this.state.loggedin) {
+            const data = await userExists();
+            if (data.success) {
+                this.setState({ loggedin: true });
+            } else {
+                this.setState({ loggedin: false });
+            }
         }
     }
+
+    async componentDidMount() {
+        this.handleStatus();
+    }
+
+    async componentDidUpdate(prevProps) {
+        if (this.props.location.pathname !== prevProps.location.pathname) {
+            this.handleStatus();
+        }
+    }
+
 }
 
 export default withRouter(TopAppBar)

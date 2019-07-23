@@ -181,6 +181,9 @@ app.on('ready', () => {
 
 
 const checkIfUserExists = (base64name) => {
+    if (!base64name) {
+        return { success: false };
+    }
     return new Promise((resolve, reject) => {
         db.collection('tinsonFiles').findOne({ name: base64name })
             .then(function (res) {

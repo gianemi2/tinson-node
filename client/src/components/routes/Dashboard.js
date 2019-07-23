@@ -48,11 +48,15 @@ export default class Dashboard extends Component {
     }
 
     async componentDidMount() {
-
-        const data = await userExists();
-        if (!data.success) {
+        if (sessionStorage.getItem('_id') !== null) {
+            const data = await userExists();
+            if (!data.success) {
+                this.setState({ fraud: true });
+            } else {
+                this.fetchGames();
+            }
+        } else {
             this.setState({ fraud: true });
         }
-        this.fetchGames();
     }
 }
