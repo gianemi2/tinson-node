@@ -84,6 +84,7 @@ export default class LoginForm extends Component {
         const data = await loginUser(username, password);
         if (data.success) {
             sessionStorage.setItem('_id', data._id);
+            alert(data.message);
             this.setState({ loggedIn: true })
         } else {
             alert(data.message);

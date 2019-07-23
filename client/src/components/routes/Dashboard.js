@@ -35,7 +35,7 @@ export default class Dashboard extends Component {
     fetchGames = async () => {
         const response = await fetchGameList();
         if (response.success) {
-            this.setState({ games: JSON.parse(response.data).files })
+            this.setState({ games: response.data })
         }
     }
 

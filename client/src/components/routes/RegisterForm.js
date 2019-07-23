@@ -89,7 +89,10 @@ export default class RegisterForm extends Component {
         const data = await registerUser(name, password);
 
         if (data.success) {
+            alert(data.message);
             this.setState({ registered: true });
+        } else {
+            console.log(data);
         }
     }
 }
