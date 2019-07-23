@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Grid, FormControl, TextField, Button } from '@material-ui/core'
 
-import { addGameToList } from '../../api'
+import { addGameToList } from '../../../api'
 
 export default class AddGame extends Component {
     constructor(props) {
@@ -61,7 +61,6 @@ export default class AddGame extends Component {
                             value={this.state.gameLink}
                             onChange={this.handleChange}
                             margin="normal"
-                            aria-describedBy="my-helper-text"
                             type="url"
                         />
                     </FormControl>

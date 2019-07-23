@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 
-import { userExists, fetchGameList, deleteGameFromList } from '../api'
+import { userExists, fetchGameList, deleteGameFromList } from '../../api'
 import AddGame from './Dashboard/AddGame'
 import GameList from './Dashboard/GameList'
 import Informations from './Dashboard/Informations';

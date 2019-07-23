@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect, Link as RouterLink } from 'react-router-dom'
 import { TextField, Typography, Button, Link, FormControl, Grid } from '@material-ui/core'
 
-import { loginUser } from '../api'
+import { loginUser } from '../../api'
 
 export default class LoginForm extends Component {
     constructor(props) {
@@ -41,7 +41,6 @@ export default class LoginForm extends Component {
                                 value={this.state.username}
                                 onChange={this.handleChange}
                                 margin="normal"
-                                aria-describedBy="my-helper-text"
                             />
                         </FormControl>
                         <FormControl style={{ marginRight: 10 }}>

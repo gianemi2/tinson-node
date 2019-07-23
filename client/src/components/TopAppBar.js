@@ -1,9 +1,10 @@
 import React from 'react';
 import { AppBar, Button, Toolbar, Typography, Icon, IconButton } from '@material-ui/core';
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, withRouter } from 'react-router-dom'
+
 import { userExists } from '../api'
 
-export default class TopAppBar extends React.Component {
+class TopAppBar extends React.Component {
 
     constructor(props) {
         super(props);
@@ -11,13 +12,32 @@ export default class TopAppBar extends React.Component {
             loggedin: false
         }
     }
+
+    async componentDidUpdate(prevProps) {
+        if (this.props.location.pathname !== prevProps.location.pathname) {
+            const data = await userExists();
+            if (data.success) {
+                this.setState({ loggedin: true });
+            } else {
+                this.setState({ loggedin: false });
+            }
+        }
+    }
+
     render() {
         let button;
         if (!this.state.loggedin) {
-            button = <React.Fragment><Button component={RouterLink} color="inherit" to="/login">Login</Button><Button component={RouterLink} color="inherit" to="/register">Register</Button></React.Fragment>;
+            button = <React.Fragment>
+                <Button component={RouterLink} color="inherit" to="/login">Login</Button>
+                <Button component={RouterLink} color="inherit" to="/register">Register</Button>
+            </React.Fragment>;
         } else {
-            button = <Button component={RouterLink} color="inherit" to="/dashboard">Dashboard</Button>
+            button = <React.Fragment>
+                <Button component={RouterLink} color="inherit" to="/dashboard">Dashboard</Button>
+                <Button component={RouterLink} color="inherit" to="/logout">Logout</Button>
+            </React.Fragment>
         }
+
         return (
             <div style={{
                 flexGrow: 1,
@@ -50,3 +70,5 @@ export default class TopAppBar extends React.Component {
         }
     }
 }
+
+export default withRouter(TopAppBar)
