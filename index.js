@@ -4,7 +4,7 @@ const fs = require('fs')
 require('dotenv').config();
 
 const app = express();
-const { BASE_SALT } = process.env;
+const BASE_SALT = '16sette11'; // add a salt just for split user from password in React
 
 app.use(express.json()) // for parsing application/json
 

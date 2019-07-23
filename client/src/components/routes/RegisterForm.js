@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Redirect, Link as RouterLink } from 'react-router-dom'
 import { Typography, Grid, FormControl, TextField, Button, Link } from '@material-ui/core'
 
-import { registerUser } from '../api'
+import { registerUser } from '../../api'
 
 export default class RegisterForm extends Component {
     constructor(props) {
@@ -41,7 +41,6 @@ export default class RegisterForm extends Component {
                                 value={this.state.name}
                                 onChange={this.handleChange}
                                 margin="normal"
-                                aria-describedBy="my-helper-text"
                             />
                         </FormControl>
                         <FormControl style={{ marginRight: 10 }}>
@@ -81,7 +80,7 @@ export default class RegisterForm extends Component {
 
     renderRedirect() {
         if (this.state.registered) {
-            return <Redirect to='/login'></Redirect>;
+            return <Redirect to='/dashboard'></Redirect>;
         }
     }
 

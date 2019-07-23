@@ -58,7 +58,7 @@ export default function GameList(props) {
                                 </ListItemIcon>
                                 <ListItemText id={labelId} primary={name} />
                                 <ListItemSecondaryAction>
-                                    <a style={{textDecoration: 'none'}} href={value} target="_blank" rel="noopener noreferrer">
+                                    <a style={{ textDecoration: 'none' }} href={value} target="_blank" rel="noopener noreferrer">
                                         <IconButton edge="end" aria-label="Comments">
                                             <Icon>open_in_new</Icon>
                                         </IconButton>
@@ -68,7 +68,7 @@ export default function GameList(props) {
                         );
                     })}
                 </List>
-                <Button style={{marginTop: 15}} onClick={() => {
+                <Button style={{ marginTop: 15 }} onClick={() => {
                     setChecked([])
                     props.onTriggerDelete(checked)
                 }} variant="contained" color="secondary" className={classes.button}>
