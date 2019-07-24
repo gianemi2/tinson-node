@@ -6,7 +6,7 @@ export default class Homepage extends Component {
         return (
             <div>
                 <Typography variant="h3" gutterBottom>
-                    Welcome to Tinson!
+                    Welcome to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                     <b>Tinson</b> is a little JSON generator for the famous NSP installer of Nintendo Switch, <a style={{ color: "inherit" }} href="https://tinfoil.io/Download" target="_blank" rel="noopener noreferrer">Tinfoil</a>.
