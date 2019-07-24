@@ -11,6 +11,7 @@ import LoginForm from './components/routes/LoginForm'
 import Dashboard from './components/routes/Dashboard'
 import Homepage from './components/routes/Homepage';
 import Logout from './components/routes/Logout';
+import Footer from './components/Footer';
 
 import './App.css';
 
@@ -51,9 +52,9 @@ class App extends React.Component {
             <React.Fragment>
                 <ThemeProvider theme={this.state.theme}>
                     <CssBaseline />
-                    <Container maxWidth="md">
+                    <Container maxWidth="md" style={{ height: 'calc(100vh - 25px)', display: "flex", flexDirection: "column" }}>
                         <Router>
-                            <div>
+                            <div style={{ flex: 1 }}>
                                 <TopAppBar onChangeTheme={this.handleChangeTheme}></TopAppBar>
 
                                 <Route path="/" exact component={Homepage} />
@@ -61,7 +62,10 @@ class App extends React.Component {
                                 <Route path="/register" component={RegisterForm} />
                                 <Route path="/login" component={LoginForm} />
                                 <Route path="/dashboard" component={Dashboard} />
+
                             </div>
+
+                            <Footer></Footer>
                         </Router>
                     </Container>
                 </ThemeProvider>

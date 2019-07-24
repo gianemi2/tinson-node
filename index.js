@@ -159,7 +159,7 @@ app.get('/v1/:user/:pass', async (req, res) => {
     const base64name = Buffer.from(user + BASE_SALT + pass).toString('base64');
     const response = await checkIfUserExists(base64name);
     if (response.success) {
-        const forTinfoil = { files: response.data.files }
+        const forTinfoil = { files: response.data.files, success: "Thanks for using Tinson! For every issue please report it in issues tab in Github (github.com/gianemi2/tinson-node)" }
         res.json(forTinfoil);
     } else {
         res.json({ success: false, message: 'Something wrong happened' })
