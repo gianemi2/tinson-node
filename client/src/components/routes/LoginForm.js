@@ -22,7 +22,7 @@ export default class LoginForm extends Component {
             <React.Fragment>
                 {this.renderRedirect()}
                 <Typography variant="h3" gutterBottom>
-                    Login
+                    Login to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
                     Use your credentials to login.

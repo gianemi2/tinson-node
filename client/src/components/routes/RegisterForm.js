@@ -22,7 +22,7 @@ export default class RegisterForm extends Component {
             <React.Fragment>
                 {this.renderRedirect()}
                 <Typography variant="h3" gutterBottom>
-                    Register to Tinson
+                    Register to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
                 <Typography variant="subtitle1" gutterBottom>
                     Please, fill up the registration form for start using Tinson.
