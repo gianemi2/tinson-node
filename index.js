@@ -187,6 +187,7 @@ const checkIfUserExists = (base64name) => {
     return new Promise((resolve, reject) => {
         db.collection('tinsonFiles').findOne({ name: base64name })
             .then(function (res) {
+                if (res == null) throw new Error('No user found with this name');
                 resolve({ success: true, data: res })
             })
             .catch(function (err) {
