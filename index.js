@@ -115,7 +115,10 @@ app.post('/api/add-game', async (req, res) => {
     const entries = await checkIfUserExists(req.headers.authorization);
     if (entries.success) {
         const gameList = entries.data.files;
-        const game = `https://docs.google.com/uc?export=download&id=${req.body.gid}#${req.body.gname}.nsp`;
+        const gname = req.body.gname.replace(/\w+/g, (txt) => {
+            return txt.charAt(0).toUpperCase() + txt.substr(1);
+        }).replace(/\s/g, '');
+        const game = `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.nsp`;
         gameList.push(game);
         const { success } = await updateEntry(req.headers.authorization, gameList);
         if (success) {
