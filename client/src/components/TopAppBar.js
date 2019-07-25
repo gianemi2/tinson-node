@@ -36,7 +36,7 @@ class TopAppBar extends React.Component {
                 <AppBar position="static" color="default">
                     <Toolbar>
                         <Typography variant="h6" style={{ flexGrow: 1 }}>
-                            <RouterLink style={{ color: 'inherit', textDecoration: 'none' }} to="/">Tinson</RouterLink>
+                            <RouterLink style={{ color: 'inherit', textDecoration: 'none' }} to="/">Tinson <span role="img" aria-label="Tinson icon!">🤖</span></RouterLink>
                         </Typography>
                         <IconButton
                             color="inherit"
