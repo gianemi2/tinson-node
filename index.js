@@ -24,49 +24,6 @@ app.use(express.json()) // for parsing application/json
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/api/add', async (req, res) => {
-    const myFile = new Tinson({
-        name: 'myOldNewTest',
-        files: [1, 2, 3]
-    })
-    db.collection('tinsonFiles').insertOne(myFile, function (err, result) {
-        if (err) res.json({ success: false, data: err })
-        res.json({ success: true, message: 'User created succesfully!', data: result });
-    });
-    //db.collection('tinsonFiles').drop();
-})
-
-app.get('/api/listAll', (req, res) => {
-    db.collection('tinsonFiles').find({}).toArray(function (err, result) {
-        res.json(result);
-    })
-})
-
-app.get('/api/list', (req, res) => {
-    db.collection('tinsonFiles').find({ name: 'myNewTest' }).toArray(function (err, result) {
-        res.json({ error: err, result: result });
-    })
-})
-
-app.get('/api/fulldrop', async (req, res) => {
-    const result = await db.collection('tinsonFiles').reIndex();
-    res.json(result);
-})
-
-app.get('/api/update/:name', async (req, res) => {
-    const { name } = req.params;
-    db.collection('tinsonFiles').update(
-        {
-            "name": name,
-        },
-        {
-            $set: {
-                "files": [3, 4, 5]
-            }
-        }
-    )
-})
-
 // Put all API endpoints under '/api'
 app.post('/api/register', (req, res) => {
 
@@ -105,7 +62,6 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/exists', async (req, res) => {
     const base64name = req.body._id;
     const exists = await checkIfUserExists(base64name);
-    console.log(exists);
     if (exists.success) {
         res.json({ success: true })
     }
@@ -157,6 +113,7 @@ app.post('/api/gamelist', async (req, res) => {
     }
 })
 
+// Route for Tinfoil. Return user JSON if it exists.
 app.get('/v1/:user/:pass', async (req, res) => {
     const { user, pass } = req.params;
     const base64name = Buffer.from(user + BASE_SALT + pass).toString('base64');
