@@ -10,6 +10,8 @@ export default class AddFolder extends Component {
             dirname: '',
             dirlink: ''
         }
+
+        this.props.isOnBeta(true)
     }
 
     handleChange = ({ target }) => {
