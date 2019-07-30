@@ -38,7 +38,7 @@ export default function GameList(props) {
 
         setChecked(newChecked);
     };
-    if (props.games.length > 0) {
+    if (props.games && props.games.length > 0) {
         return (
             <React.Fragment>
                 <List className={classes.root}>
@@ -78,6 +78,6 @@ export default function GameList(props) {
             </React.Fragment>
         );
     } else {
-        return 'No games found...';
+        return props.loadingFolders ? 'No folders found...' : 'No files found...';
     }
 }
