@@ -8,7 +8,8 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 const db = mongoose.connection;
 const tinsonSchema = new mongoose.Schema({
     name: { type: String, index: { unique: true } },
-    files: { type: Array }
+    files: { type: Array },
+    directories: { type: Array }
 });
 const Tinson = mongoose.model('tinsonFiles', tinsonSchema);
 db.once('open', function () {
@@ -23,6 +24,8 @@ app.use(express.json()) // for parsing application/json
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
+
+
 
 // Put all API endpoints under '/api'
 app.post('/api/register', (req, res) => {
@@ -67,6 +70,26 @@ app.post('/api/exists', async (req, res) => {
     }
 })
 
+app.post('/api/add-folder', async (req, res) => {
+    const entries = await checkIfUserExists(req.headers.authorization);
+    if (entries.success) {
+        const directoriesList = entries.data.directories ? entries.data.directories : [];
+        const dirname = req.body.dirname.replace(/\w+/g, (txt) => {
+            return txt.charAt(0).toUpperCase() + txt.substr(1);
+        }).replace(/\s/g, '');
+        const link = `${req.body.dirlink}#${req.body.dirname}`;
+        directoriesList.push(link);
+        const { success } = await updateEntry(req.headers.authorization, directoriesList, true);
+        if (success) {
+            res.json({ success: true, message: 'Games updated correctly!' })
+        } else {
+            res.json({ success: false, message: 'Something wrong happened!' })
+        }
+    } else {
+        res.json({ success: false, message: 'User not found :(', error: entries.err })
+    }
+})
+
 app.post('/api/add-game', async (req, res) => {
     const entries = await checkIfUserExists(req.headers.authorization);
     if (entries.success) {
@@ -90,19 +113,24 @@ app.post('/api/add-game', async (req, res) => {
 app.get('/api/gamelist', async (req, res) => {
     const entries = await checkIfUserExists(req.headers.authorization);
     entries.success
-        ? res.json({ success: true, message: 'List loaded succesfully', data: entries.data.files })
+        ? res.json({ success: true, message: 'List loaded succesfully', data: entries.data })
         : res.json({ success: false, message: 'User not found', error: entries.data });
 })
 
 app.post('/api/gamelist', async (req, res) => {
     const target = req.body.index;
+    const deleteFolder = req.body.deletefolder;
+
+    const toDelete = deleteFolder ? 'directories' : 'files';
+
     const base64name = req.headers.authorization;
     const entries = await checkIfUserExists(base64name);
 
     if (entries.success) {
-        let { files } = entries.data;
-        files = files.filter((v, i) => !target.includes(i));
-        const { success } = await updateEntry(base64name, files);
+        let contentToDelete = entries.data[toDelete];
+        contentToDelete = contentToDelete.filter((v, i) => !target.includes(i));
+        console.log(contentToDelete);
+        const { success } = await updateEntry(base64name, contentToDelete, deleteFolder);
         if (success) {
             res.json({ success: true });
         } else {
@@ -119,7 +147,11 @@ app.get('/v1/:user/:pass', async (req, res) => {
     const base64name = Buffer.from(user + BASE_SALT + pass).toString('base64');
     const response = await checkIfUserExists(base64name);
     if (response.success) {
-        const forTinfoil = { files: response.data.files, success: "Thanks for using Tinson! For every issue please report it in issues tab in Github (github.com/gianemi2/tinson-node)" }
+        const forTinfoil = {
+            files: response.data.files,
+            directories: response.data.directories,
+            success: "Thanks for using Tinson! For every issue please report it in issues tab in Github (github.com/gianemi2/tinson-node)"
+        }
         res.json(forTinfoil);
     } else {
         res.json({ success: false, message: 'Something wrong happened' })
@@ -156,9 +188,13 @@ const checkIfUserExists = (base64name) => {
     })
 }
 
-const updateEntry = function (base64name, files) {
+const updateEntry = function (base64name, files, isFolder = false) {
+    const update = isFolder
+        ? { $set: { "directories": files } }
+        : { $set: { "files": files } };
+
     return new Promise((resolve, reject) => {
-        db.collection('tinsonFiles').updateOne({ "name": base64name }, { $set: { "files": files } })
+        db.collection('tinsonFiles').updateOne({ "name": base64name }, update)
             .then(function (res) {
                 resolve({ success: true, data: res })
             })
