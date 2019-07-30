@@ -10,10 +10,12 @@ export default class AddGame extends Component {
             gameLink: '',
             gameName: ''
         }
+        this.props.isOnBeta(false);
     }
     handleChange = ({ target }) => {
         this.setState({ [target.name]: target.value });
     }
+
 
     handleSubmit = async (e) => {
         e.preventDefault();

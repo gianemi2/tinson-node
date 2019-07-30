@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
-import { FormControlLabel, Switch } from '@material-ui/core'
+import { FormControlLabel, Switch, Chip } from '@material-ui/core'
 
 import { userExists, fetchGameList, deleteEntriesFromList } from '../../api'
 import AddGame from './Dashboard/AddGame'
@@ -15,7 +15,8 @@ export default class Dashboard extends Component {
             fraud: false,
             games: [],
             content: [],
-            folderMode: false
+            folderMode: false,
+            beta: false
         }
     }
 
@@ -36,9 +37,14 @@ export default class Dashboard extends Component {
                     label="Manage folders mode"
                 />
                 {
+                    this.state.beta
+                        ? <Chip style={{ fontSize: 16, marginLeft: 15 }} label="Beta feature" color="secondary" />
+                        : false
+                }
+                {
                     this.state.folderMode
-                        ? <AddFolder onFolderUpdated={this.fetchGames}></AddFolder>
-                        : <AddGame onGameUpdated={this.fetchGames}></AddGame>
+                        ? <AddFolder isOnBeta={(beta) => this.setBetaStatus(beta)} onFolderUpdated={this.fetchGames}></AddFolder>
+                        : <AddGame isOnBeta={(beta) => this.setBetaStatus(beta)} onGameUpdated={this.fetchGames}></AddGame>
                 }
                 <GameList
                     onTriggerDelete={(index) => this.deleteEntries(index)}
@@ -46,6 +52,10 @@ export default class Dashboard extends Component {
                     loadingFolders={this.state.folderMode}></GameList>
             </React.Fragment>
         )
+    }
+
+    setBetaStatus(betaStatus) {
+        this.setState({ beta: betaStatus });
     }
 
     handleChangeMode() {
