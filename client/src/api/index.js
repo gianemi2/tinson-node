@@ -37,6 +37,20 @@ export const addGameToList = async (gid, gname) => {
     return data;
 }
 
+export const addFolderToList = async (dirlink, dirname) => {
+    const { data } = await axios.post('/api/add-folder',
+        {
+            dirlink: dirlink,
+            dirname: dirname
+        },
+        {
+            headers: {
+                'Authorization': sessionStorage.getItem('_id')
+            }
+        })
+    return data;
+}
+
 export const fetchGameList = async () => {
     const { data } = await axios.get('/api/gamelist', {
         headers: {
@@ -46,10 +60,11 @@ export const fetchGameList = async () => {
     return data;
 }
 
-export const deleteGameFromList = async (i) => {
+export const deleteEntriesFromList = async (i, folder) => {
     const { data } = await axios.post('/api/gamelist',
         {
-            index: i
+            index: i,
+            deletefolder: folder
         },
         {
             headers: {
