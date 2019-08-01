@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
 require('dotenv').config();
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
@@ -8,7 +9,7 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 const db = mongoose.connection;
 const tinsonSchema = new mongoose.Schema({
     name: { type: String, index: { unique: true } },
-    files: { type: Array },
+    files: { type: [{ url: String, size: Number }] },
     directories: { type: Array }
 });
 const Tinson = mongoose.model('tinsonFiles', tinsonSchema);
@@ -24,8 +25,6 @@ app.use(express.json()) // for parsing application/json
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
-
-
 
 // Put all API endpoints under '/api'
 app.post('/api/register', (req, res) => {
@@ -93,13 +92,21 @@ app.post('/api/add-folder', async (req, res) => {
 app.post('/api/add-game', async (req, res) => {
     const entries = await checkIfUserExists(req.headers.authorization);
     if (entries.success) {
+
         const gameList = entries.data.files;
         const gname = req.body.gname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
-        const game = `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.nsp`;
+
+        let size = await getDriveFileSize(req.body.gid);
+        const game = {
+            url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.nsp`,
+            size: size
+        }
         gameList.push(game);
+
         const { success } = await updateEntry(req.headers.authorization, gameList);
+
         if (success) {
             res.json({ success: true, message: 'Games updated correctly!' })
         } else {
@@ -110,8 +117,13 @@ app.post('/api/add-game', async (req, res) => {
     }
 })
 
+// List of all games inside JSON
 app.get('/api/gamelist', async (req, res) => {
-    const entries = await checkIfUserExists(req.headers.authorization);
+    let entries = await checkIfUserExists(req.headers.authorization);
+    if (entries.data.files.length > 0 && entries.data.files.every((i) => typeof i === "string")) {
+        entries = await solveCompatibilityIssues(entries);
+    }
+
     entries.success
         ? res.json({ success: true, message: 'List loaded succesfully', data: entries.data })
         : res.json({ success: false, message: 'User not found', error: entries.data });
@@ -201,5 +213,35 @@ const updateEntry = function (base64name, files, isFolder = false) {
             .catch(function (err) {
                 resolve({ success: false, data: err })
             })
+    })
+}
+
+const solveCompatibilityIssues = async function (entries) {
+    const model = entries.data;
+    const newFilesObj = [];
+    for (let i = 0; i < model.files.length; i++) {
+        const id = new URL(model.files[i]).searchParams.get('id');
+        const newFile = {
+            url: model.files[i],
+            size: await getDriveFileSize(id)
+        }
+        newFilesObj.push(newFile);
+    }
+    return new Promise((resolve, reject) => {
+        db.collection('tinsonFiles').updateOne({ "name": model.name }, {
+            $set: { files: newFilesObj }
+        })
+    })
+        .then((res) => {
+            resolve({ success: true, data: res })
+        })
+        .catch((err) => {
+            resolve({ success: false, data: err })
+        })
+}
+
+const getDriveFileSize = async function (driveId) {
+    return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`).then(res => {
+        return res.data.fileSize ? res.data.fileSize : 0;
     })
 }

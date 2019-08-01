@@ -21,6 +21,8 @@ Well it's pretty easy. There're three steps in total to follow.
 2. Add some Google Drive links to your dashboard. 
 3. Copy the link in your dashboard (should be something like `tinson.herokuapp.com/v1/:yourname/:yourpassword`) and insert it in Tinfoil's file browser. 
 
+Now you can also add Google drive folders to Tinson. Process is the same as single links. **Note: this functionality is still in beta. Please report any problems in issues tab.**
+
 Tinfoil will auto upload the file if you'll insert new games in the list. So the 3rd step is required just for the first time.
 
 ### Prerequisites
