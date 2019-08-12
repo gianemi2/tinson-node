@@ -23,6 +23,10 @@ export default class Dashboard extends Component {
     render() {
         return (
             <React.Fragment>
+                <p>
+                    Tinson has been updated massively. A lot of things has been changed for security reasons. Unfortunately this brings to a factory reset of the DB. So every game added to a list has been removed.
+                    If you had a very long list and you're tired of import it back, please send me a message on discord (<u>gianemi2#0920</u>) and I'll get back to you as soon as possible.
+                </p>
                 <FormControlLabel
                     control={
                         <Switch
