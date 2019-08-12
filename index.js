@@ -145,7 +145,7 @@ app.post('/api/add-game', withAuth, async (req, res) => {
 
     if (entries.success) {
         // Retrieve list or initiate empty array
-        const gameList = entries.data.files;
+        const gameList = entries.data.files ? entries.data.files : [];
         // Flush strange chars on name
         const gname = req.body.gname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
@@ -302,7 +302,7 @@ const getDriveFileSize = async function (driveId) {
         .then(response => {
             if (response) {
                 return response.data.fileSize
-                    ? parseInt(res.data.fileSize)
+                    ? parseInt(response.data.fileSize)
                     : 0;
             }
         })

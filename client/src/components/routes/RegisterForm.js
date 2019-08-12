@@ -20,7 +20,6 @@ export default class RegisterForm extends Component {
     render() {
         return (
             <React.Fragment>
-                {this.renderRedirect()}
                 <Typography variant="h3" gutterBottom>
                     Register to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
