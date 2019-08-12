@@ -2,7 +2,7 @@ import React from 'react';
 import { AppBar, Button, Toolbar, Typography, Icon, IconButton } from '@material-ui/core';
 import { Link as RouterLink, withRouter } from 'react-router-dom'
 
-import { userExists } from '../api'
+import { checkToken } from '../api'
 
 class TopAppBar extends React.Component {
 
@@ -54,7 +54,7 @@ class TopAppBar extends React.Component {
 
     async handleStatus() {
         if (!this.state.loggedin) {
-            const data = await userExists();
+            const data = await checkToken();
             if (data.success) {
                 this.setState({ loggedin: true });
             } else {

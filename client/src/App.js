@@ -5,6 +5,8 @@ import { Container, CssBaseline } from '@material-ui/core'
 import { createMuiTheme } from '@material-ui/core/styles'
 import { ThemeProvider } from '@material-ui/styles';
 
+import withAuth from './components/withAuth';
+
 import TopAppBar from './components/TopAppBar'
 import RegisterForm from './components/routes/RegisterForm'
 import LoginForm from './components/routes/LoginForm'
@@ -61,7 +63,7 @@ class App extends React.Component {
                                 <Route path="/logout" component={Logout} />
                                 <Route path="/register" component={RegisterForm} />
                                 <Route path="/login" component={LoginForm} />
-                                <Route path="/dashboard" component={Dashboard} />
+                                <Route path="/dashboard" component={withAuth(Dashboard)} />
 
                             </div>
 

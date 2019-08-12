@@ -1,10 +1,17 @@
 import axios from 'axios';
 
-export const userExists = async () => {
-    const { data } = await axios.post('/api/exists', {
-        _id: sessionStorage.getItem('_id')
-    })
-    return data;
+export const checkToken = async () => {
+    return axios.get('/checkToken')
+        .then(res => {
+            if (res.status === 200) {
+                return { success: true, data: "User logged in", id: res.data.data };
+            } else {
+                throw new Error('User not logged in. Some problems appear.');
+            }
+        })
+        .catch(err => {
+            return { success: false, data: err };
+        })
 }
 
 export const registerUser = async (name, password) => {
@@ -16,11 +23,15 @@ export const registerUser = async (name, password) => {
 }
 
 export const loginUser = async (name, password) => {
-    const { data } = await axios.post('/api/login', {
-        name: name,
-        password: password
-    })
-    return data;
+    return axios.post('/api/authenticate', { name, password })
+        .then(response => {
+            if (response.status === 200) {
+                return { success: true, data: 'Account logged in succesfully.' }
+            }
+        })
+        .catch(err => {
+            return { success: false, data: err.data }
+        });
 }
 
 export const addGameToList = async (gid, gname) => {
@@ -65,11 +76,6 @@ export const deleteEntriesFromList = async (i, folder) => {
         {
             index: i,
             deletefolder: folder
-        },
-        {
-            headers: {
-                'Authorization': sessionStorage.getItem('_id')
-            }
         }
     );
     return data;

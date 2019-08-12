@@ -1,26 +1,36 @@
+// Get something useful
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
 const axios = require('axios');
-require('dotenv').config();
-const mongoose = require('mongoose');
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 
+// Retrieve all .env configurations
+require('dotenv').config();
+
+// Setup all DB configurations and models
+const mongoose = require('mongoose');
+const User = require('./models/User');
+const Tinson = require('./models/Tinson');
+
+// Import something for auth flow
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const withAuth = require('./middleware');
+const Hashkit = require("hashkit");
+const secret = process.env.SECRET;
+
+const hashkit = new Hashkit();
+
+// Db setup
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 const db = mongoose.connection;
-const tinsonSchema = new mongoose.Schema({
-    name: { type: String, index: { unique: true } },
-    files: { type: [{ url: String, size: Number }] },
-    directories: { type: Array }
-});
-const Tinson = mongoose.model('tinsonFiles', tinsonSchema);
 db.once('open', function () {
     // All OK - fire (emit) a ready event. 
     app.emit('ready');
 });
 
+// App setup
 const app = express();
-const BASE_SALT = '16sette11'; // add a salt just for split user from password in React
-
+app.use(cookieParser()); // for parsing cookies
 app.use(express.json()) // for parsing application/json
 
 // Serve static files from the React app
@@ -30,55 +40,95 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.post('/api/register', (req, res) => {
 
     const { name, password } = req.body;
-    if (name && password) {
-        const base64name = Buffer.from(name + BASE_SALT + password).toString('base64');
-        const file = new Tinson({
-            name: base64name
-        })
-        db.collection('tinsonFiles').insertOne(file, function (err, response) {
-            if (err) {
-                const message = (err.code === 11000
-                    ? 'Account already exists. Please login.'
-                    : 'Some error appear!');
-                res.json({ success: false, message: message, data: err });
+    const user = new User({ name, password });
+
+    user.save(function (err) {
+        if (err) {
+            if (err.code == 11000) {
+                res.json({ success: false, data: 'User already registered. Please log in.' })
             } else {
-                res.json({ success: true, message: "Account created succesfully" });
+                res.json({ success: false, data: "Error registering new user please try again." });
             }
-        })
-    }
+        } else {
+            const tinson = new Tinson({ name: user._id });
+            tinson.save(function (err) {
+                if (err) {
+                    res.json({ success: false, data: "Some error occured", error: err })
+                } else {
+                    res.json({ success: true, data: "User registered succesfully." });
+                }
+            })
+        }
+    });
 });
 
-app.post('/api/login', async (req, res) => {
-
+// Authentication on login
+app.post('/api/authenticate', function (req, res) {
     const { name, password } = req.body;
-    const base64name = Buffer.from(name + BASE_SALT + password).toString('base64');
+    User.findOne({ name }, function (err, user) {
+        if (err) {
+            res.status(500)
+                .json({
+                    success: false,
+                    data: 'Internal error please try again'
+                });
+        } else if (!user) {
+            res.status(401)
+                .json({
+                    success: false,
+                    data: 'Incorrect email or password'
+                });
+        } else {
+            user.isCorrectPassword(password, function (err, same) {
+                if (err) {
+                    res.status(500)
+                        .json({
+                            success: false,
+                            data: 'Internal error please try again'
+                        });
+                } else if (!same) {
+                    res.status(401)
+                        .json({
+                            success: false,
+                            data: 'Incorrect email or password'
+                        });
+                } else {
+                    // Issue token
+                    const payload = { id: user.id };
+                    const token = jwt.sign(payload, secret, {
+                        expiresIn: '1h'
+                    });
+                    res.cookie('token', token, { httpOnly: true })
+                        .sendStatus(200);
+                }
+            });
+        }
+    });
+});
 
-    const entries = await checkIfUserExists(base64name);
+// Check if user is logged in
+app.get('/checkToken', withAuth, (req, res) => {
+    res.status(200).json({ success: true, data: req.id });
+});
+
+// Route for add folders.
+app.post('/api/add-folder', withAuth, async (req, res) => {
+    const entries = await checkIfUserExists(req.id);
+
     if (entries.success) {
-        res.json({ success: true, message: "Logged in. You're going to be redirected to dashboard", _id: base64name });
-    } else {
-        res.json({ success: false, message: 'No user found with this credentials. Please register now.' })
-    }
-})
-
-app.post('/api/exists', async (req, res) => {
-    const base64name = req.body._id;
-    const exists = await checkIfUserExists(base64name);
-    if (exists.success) {
-        res.json({ success: true })
-    }
-})
-
-app.post('/api/add-folder', async (req, res) => {
-    const entries = await checkIfUserExists(req.headers.authorization);
-    if (entries.success) {
+        // Retrieve list or initiate empty array
         const directoriesList = entries.data.directories ? entries.data.directories : [];
+        // Flush strange chars on name
         const dirname = req.body.dirname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
-        const link = `${req.body.dirlink}#${req.body.dirname}`;
+        // Mount link with name
+        const link = `${req.body.dirlink}#${dirname}`;
+        // Push it to array
         directoriesList.push(link);
-        const { success } = await updateEntry(req.headers.authorization, directoriesList, true);
+
+        // Try to update
+        const { success } = await updateEntry(req.id, directoriesList, true);
         if (success) {
             res.json({ success: true, message: 'Games updated correctly!' })
         } else {
@@ -89,23 +139,30 @@ app.post('/api/add-folder', async (req, res) => {
     }
 })
 
-app.post('/api/add-game', async (req, res) => {
-    const entries = await checkIfUserExists(req.headers.authorization);
-    if (entries.success) {
+// Route for add files
+app.post('/api/add-game', withAuth, async (req, res) => {
+    const entries = await checkIfUserExists(req.id);
 
+    if (entries.success) {
+        // Retrieve list or initiate empty array
         const gameList = entries.data.files;
+        // Flush strange chars on name
         const gname = req.body.gname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
-
+        // Retrieve file size using gDrive API
         let size = await getDriveFileSize(req.body.gid);
+
         const game = {
+            // Mount link with name
             url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.nsp`,
             size: size
         }
+        // Push it to array
         gameList.push(game);
 
-        const { success } = await updateEntry(req.headers.authorization, gameList);
+        // Try to update
+        const { success } = await updateEntry(req.id, gameList);
 
         if (success) {
             res.json({ success: true, message: 'Games updated correctly!' })
@@ -117,9 +174,9 @@ app.post('/api/add-game', async (req, res) => {
     }
 })
 
-// List of all games inside JSON
-app.get('/api/gamelist', async (req, res) => {
-    let entries = await checkIfUserExists(req.headers.authorization);
+// Router for list all games for current user
+app.get('/api/gamelist', withAuth, async (req, res) => {
+    let entries = await checkIfUserExists(req.id);
     if (entries.data.files.length > 0 && entries.data.files.every((i) => typeof i === "string")) {
         entries = await solveCompatibilityIssues(entries);
     }
@@ -129,35 +186,36 @@ app.get('/api/gamelist', async (req, res) => {
         : res.json({ success: false, message: 'User not found', error: entries.data });
 })
 
-app.post('/api/gamelist', async (req, res) => {
+// Route for delete games or folders
+app.post('/api/gamelist', withAuth, async (req, res) => {
+    // Get index to remove
     const target = req.body.index;
+    // Check if want to delete folder or files
     const deleteFolder = req.body.deletefolder;
-
     const toDelete = deleteFolder ? 'directories' : 'files';
-
-    const base64name = req.headers.authorization;
-    const entries = await checkIfUserExists(base64name);
+    // Retrieve current user table
+    const entries = await checkIfUserExists(req.id);
 
     if (entries.success) {
+        // Delete from array
         let contentToDelete = entries.data[toDelete];
         contentToDelete = contentToDelete.filter((v, i) => !target.includes(i));
-        console.log(contentToDelete);
-        const { success } = await updateEntry(base64name, contentToDelete, deleteFolder);
+
+        // Try to update
+        const { success } = await updateEntry(req.id, contentToDelete, deleteFolder);
         if (success) {
             res.json({ success: true });
         } else {
             res.json({ success: false, message: 'Something wrong happened' })
         }
     } else {
-        res.json({ success: false, message: 'user not found', error: err });
+        res.json({ success: false, message: 'User not found', error: err });
     }
 })
 
 // Route for Tinfoil. Return user JSON if it exists.
-app.get('/v1/:user/:pass', async (req, res) => {
-    const { user, pass } = req.params;
-    const base64name = Buffer.from(user + BASE_SALT + pass).toString('base64');
-    const response = await checkIfUserExists(base64name);
+app.get('/v1/:userid', async (req, res) => {
+    const response = await checkIfUserExists(req.params.userid);
     if (response.success) {
         const forTinfoil = {
             files: response.data.files,
@@ -166,7 +224,7 @@ app.get('/v1/:user/:pass', async (req, res) => {
         }
         res.json(forTinfoil);
     } else {
-        res.json({ success: false, message: 'Something wrong happened' })
+        res.json({ success: "Hi! This message means that Tinson is setup correctly but the no users has been found with the current ID." })
     }
 })
 
@@ -183,13 +241,12 @@ app.on('ready', () => {
     })
 })
 
-
-const checkIfUserExists = (base64name) => {
-    if (!base64name) {
-        return { success: false };
+const checkIfUserExists = (userID) => {
+    if (!userID) {
+        return { success: false, data: 'Some errors appear...' };
     }
     return new Promise((resolve, reject) => {
-        db.collection('tinsonFiles').findOne({ name: base64name })
+        Tinson.findOne({ name: userID })
             .then(function (res) {
                 if (res == null) throw new Error('No user found with this name');
                 resolve({ success: true, data: res })
@@ -206,7 +263,7 @@ const updateEntry = function (base64name, files, isFolder = false) {
         : { $set: { "files": files } };
 
     return new Promise((resolve, reject) => {
-        db.collection('tinsonFiles').updateOne({ "name": base64name }, update)
+        Tinson.updateOne({ "name": base64name }, update)
             .then(function (res) {
                 resolve({ success: true, data: res })
             })
@@ -228,7 +285,7 @@ const solveCompatibilityIssues = async function (entries) {
         newFilesObj.push(newFile);
     }
     return new Promise((resolve, reject) => {
-        db.collection('tinsonFiles').updateOne({ "name": model.name }, {
+        Tinson.updateOne({ "name": model.name }, {
             $set: { files: newFilesObj }
         })
     })
@@ -241,9 +298,16 @@ const solveCompatibilityIssues = async function (entries) {
 }
 
 const getDriveFileSize = async function (driveId) {
-    return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`).then(res => {
-        return res.data.fileSize
-            ? parseInt(res.data.fileSize)
-            : 0;
-    })
+    return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`)
+        .then(response => {
+            if (response) {
+                return response.data.fileSize
+                    ? parseInt(res.data.fileSize)
+                    : 0;
+            }
+        })
+        .catch(error => {
+            return 0;
+        })
+
 }

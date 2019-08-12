@@ -78,21 +78,13 @@ export default class RegisterForm extends Component {
         }
     }
 
-    renderRedirect() {
-        if (this.state.registered) {
-            return <Redirect to='/dashboard'></Redirect>;
-        }
-    }
-
     tryRegisterUser = async () => {
         const { name, password } = this.state;
-        const data = await registerUser(name, password);
-
-        if (data.success) {
-            alert(data.message);
+        const response = await registerUser(name, password);
+        alert(response.data);
+        if (response.success) {
             this.setState({ registered: true });
-        } else {
-            console.log(data);
+            this.props.history.push('/login');
         }
     }
 }
