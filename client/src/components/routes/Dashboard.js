@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
-import { Redirect } from 'react-router-dom'
 import { FormControlLabel, Switch, Chip } from '@material-ui/core'
 
-import { userExists, fetchGameList, deleteEntriesFromList } from '../../api'
+import { fetchGameList, deleteEntriesFromList, checkToken } from '../../api'
 import AddGame from './Dashboard/AddGame'
 import AddFolder from './Dashboard/AddFolder'
 import GameList from './Dashboard/GameList'
@@ -16,15 +15,14 @@ export default class Dashboard extends Component {
             games: [],
             content: [],
             folderMode: false,
-            beta: false
+            beta: false,
+            userID: ''
         }
     }
 
     render() {
         return (
             <React.Fragment>
-                {this.redirectIfNotLoggedIn()}
-                <Informations></Informations>
                 <FormControlLabel
                     control={
                         <Switch
@@ -50,6 +48,7 @@ export default class Dashboard extends Component {
                     onTriggerDelete={(index) => this.deleteEntries(index)}
                     games={this.state.content}
                     loadingFolders={this.state.folderMode}></GameList>
+                <Informations id={this.state.userID}></Informations>
             </React.Fragment>
         )
     }
@@ -76,10 +75,9 @@ export default class Dashboard extends Component {
         }
     }
 
-    redirectIfNotLoggedIn() {
-        if (this.state.fraud) {
-            return <Redirect to="/login" />
-        }
+    componentDidMount() {
+        this.fetchGames();
+        checkToken().then(res => this.setState({ userID: res.id }));
     }
 
     fetchGames = async () => {
@@ -96,19 +94,6 @@ export default class Dashboard extends Component {
         const response = await deleteEntriesFromList(index, this.state.folderMode);
         if (response.success) {
             this.fetchGames();
-        }
-    }
-
-    async componentDidMount() {
-        if (sessionStorage.getItem('_id') !== null) {
-            const data = await userExists();
-            if (!data.success) {
-                this.setState({ fraud: true });
-            } else {
-                this.fetchGames();
-            }
-        } else {
-            this.setState({ fraud: true });
         }
     }
 }

@@ -13,6 +13,8 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 
+function formatBytes(a, b) { if (0 == a) return "0 Bytes"; var c = 1024, d = b || 2, e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"], f = Math.floor(Math.log(a) / Math.log(c)); return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f] }
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -43,8 +45,10 @@ export default function GameList(props) {
             <React.Fragment>
                 <List className={classes.root}>
                     {props.games.map((value, index) => {
-                        const name = value.split('#')[1];
+                        const name = value.url ? value.url.split('#')[1] : value.split('#')[1];
+                        const url = value.url ? value.url : value;
                         const labelId = `checkbox-list-label-${index}`;
+                        const size = value.size ? formatBytes(value.size) : false;
                         return (
                             <ListItem key={index} role={undefined} dense button onClick={handleToggle(index)}>
                                 <ListItemIcon>
@@ -57,8 +61,9 @@ export default function GameList(props) {
                                     />
                                 </ListItemIcon>
                                 <ListItemText id={labelId} primary={name} />
+                                {size ? <ListItemText primary={size} /> : null}
                                 <ListItemSecondaryAction>
-                                    <a style={{ textDecoration: 'none' }} href={value} target="_blank" rel="noopener noreferrer">
+                                    <a style={{ textDecoration: 'none' }} href={url} target="_blank" rel="noopener noreferrer">
                                         <IconButton edge="end" aria-label="Comments">
                                             <Icon>open_in_new</Icon>
                                         </IconButton>

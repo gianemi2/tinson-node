@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Redirect, Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { TextField, Typography, Button, Link, FormControl, Grid } from '@material-ui/core'
 
 import { loginUser } from '../../api'
@@ -20,7 +20,6 @@ export default class LoginForm extends Component {
     render() {
         return (
             <React.Fragment>
-                {this.renderRedirect()}
                 <Typography variant="h3" gutterBottom>
                     Login to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
@@ -73,21 +72,13 @@ export default class LoginForm extends Component {
         this.tryLoginUser();
     }
 
-    renderRedirect() {
-        if (this.state.loggedIn) {
-            return <Redirect to='/dashboard'></Redirect>;
-        }
-    }
-
-    async tryLoginUser() {
+    tryLoginUser = async () => {
         const { username, password } = this.state;
-        const data = await loginUser(username, password);
-        if (data.success) {
-            sessionStorage.setItem('_id', data._id);
-            alert(data.message);
-            this.setState({ loggedIn: true })
+        const response = await loginUser(username, password);
+        if (response.success) {
+            this.props.history.push('/dashboard');
         } else {
-            alert(data.message);
+            alert("Something went wrong. Maybe wrong credentials or user doesn't exists at all.")
         }
     }
 }

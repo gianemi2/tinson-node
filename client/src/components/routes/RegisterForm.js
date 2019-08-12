@@ -20,7 +20,6 @@ export default class RegisterForm extends Component {
     render() {
         return (
             <React.Fragment>
-                {this.renderRedirect()}
                 <Typography variant="h3" gutterBottom>
                     Register to Tinson <span role="img" aria-label="Tinson icon!">🤖</span>
                 </Typography>
@@ -78,21 +77,13 @@ export default class RegisterForm extends Component {
         }
     }
 
-    renderRedirect() {
-        if (this.state.registered) {
-            return <Redirect to='/dashboard'></Redirect>;
-        }
-    }
-
     tryRegisterUser = async () => {
         const { name, password } = this.state;
-        const data = await registerUser(name, password);
-
-        if (data.success) {
-            alert(data.message);
+        const response = await registerUser(name, password);
+        alert(response.data);
+        if (response.success) {
             this.setState({ registered: true });
-        } else {
-            console.log(data);
+            this.props.history.push('/login');
         }
     }
 }
