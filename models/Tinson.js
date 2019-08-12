@@ -7,7 +7,7 @@ const TinsonSchema = new mongoose.Schema({
         unique: true,
         required: true
     },
-    files: { type: [{ url: String, size: Number }] },
+    files: { type: [{ url: String, size: Number, _id: false }] },
     directories: { type: Array }
 });
 
