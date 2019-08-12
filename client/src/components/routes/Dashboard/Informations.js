@@ -7,7 +7,7 @@ export default function Informations({ id }) {
             <ol>
                 <li>Press <code>X</code> on file Browser on Tinfoil.</li>
                 <li>Copy this link on configuration window:
-                    <code>{`${window.location.origin}/v1/${id}`}</code>
+                    <code style={{ marginLeft: 10, fontSize: 16 }}>{`${window.location.origin}/v1/${id}`}</code>
                 </li>
                 <li>Press save and enjoy Tinson 🤖 </li>
             </ol>

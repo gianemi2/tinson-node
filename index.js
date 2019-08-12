@@ -106,6 +106,11 @@ app.post('/api/authenticate', function (req, res) {
     });
 });
 
+app.get('/deleteSession', (req, res) => {
+    res.clearCookie("token");
+    res.json({ success: true, data: 'Logged out succesfully!' })
+})
+
 // Check if user is logged in
 app.get('/checkToken', withAuth, (req, res) => {
     res.status(200).json({ success: true, data: req.id });

@@ -9,24 +9,12 @@ class TopAppBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            loggedin: false
+            loggedin: false,
+            button: ''
         }
     }
 
     render() {
-        let button;
-        if (!this.state.loggedin) {
-            button = <React.Fragment>
-                <Button component={RouterLink} color="inherit" to="/login">Login</Button>
-                <Button component={RouterLink} color="inherit" to="/register">Register</Button>
-            </React.Fragment>;
-        } else {
-            button = <React.Fragment>
-                <Button component={RouterLink} color="inherit" to="/dashboard">Dashboard</Button>
-                <Button component={RouterLink} color="inherit" to="/logout">Logout</Button>
-            </React.Fragment>
-        }
-
         return (
             <div style={{
                 flexGrow: 1,
@@ -45,7 +33,7 @@ class TopAppBar extends React.Component {
                         >
                             <Icon>invert_colors</Icon>
                         </IconButton>
-                        {button}
+                        {this.state.button}
                     </Toolbar>
                 </AppBar>
             </div >
@@ -56,11 +44,14 @@ class TopAppBar extends React.Component {
         if (!this.state.loggedin) {
             const data = await checkToken();
             if (data.success) {
+                alert('Loggedin');
                 this.setState({ loggedin: true });
             } else {
+                alert('Not loggedin');
                 this.setState({ loggedin: false });
             }
         }
+        this.updateButtons();
     }
 
     async componentDidMount() {
@@ -70,6 +61,28 @@ class TopAppBar extends React.Component {
     async componentDidUpdate(prevProps) {
         if (this.props.location.pathname !== prevProps.location.pathname) {
             this.handleStatus();
+        }
+    }
+
+    updateButtons = () => {
+        if (!this.state.loggedin) {
+            this.setState(
+                {
+                    button: <React.Fragment>
+                        <Button component={RouterLink} color="inherit" to="/login">Login</Button>
+                        <Button component={RouterLink} color="inherit" to="/register">Register</Button>
+                    </React.Fragment>
+                }
+            )
+        } else {
+            this.setState(
+                {
+                    button: <React.Fragment>
+                        <Button component={RouterLink} color="inherit" to="/dashboard">Dashboard</Button>
+                        <Button component={RouterLink} color="inherit" to="/logout">Logout</Button>
+                    </React.Fragment>
+                }
+            );
         }
     }
 

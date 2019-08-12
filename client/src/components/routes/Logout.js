@@ -1,9 +1,21 @@
 import React from 'react'
 import { Redirect } from 'react-router-dom'
+import axios from 'axios';
 
-export default function Logout() {
-    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    return (
-        <Redirect to="/login"></Redirect>
-    )
+export default class Logout extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            redirecting: false
+        }
+    }
+    render() {
+        return this.state.redirecting ? <Redirect to="/login"></Redirect> : 'Redirecting ...'
+    }
+    async componentDidMount() {
+        const { data } = await axios.get('/deleteSession');
+        if (data.success) {
+            this.setState({ redirecting: true });
+        }
+    }
 }
