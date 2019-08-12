@@ -45,8 +45,8 @@ export default function GameList(props) {
             <React.Fragment>
                 <List className={classes.root}>
                     {props.games.map((value, index) => {
-                        console.log('test', value);
                         const name = value.url ? value.url.split('#')[1] : value.split('#')[1];
+                        const url = value.url ? value.url : value;
                         const labelId = `checkbox-list-label-${index}`;
                         const size = value.size ? formatBytes(value.size) : false;
                         return (
@@ -63,7 +63,7 @@ export default function GameList(props) {
                                 <ListItemText id={labelId} primary={name} />
                                 {size ? <ListItemText primary={size} /> : null}
                                 <ListItemSecondaryAction>
-                                    <a style={{ textDecoration: 'none' }} href={value.url} target="_blank" rel="noopener noreferrer">
+                                    <a style={{ textDecoration: 'none' }} href={url} target="_blank" rel="noopener noreferrer">
                                         <IconButton edge="end" aria-label="Comments">
                                             <Icon>open_in_new</Icon>
                                         </IconButton>

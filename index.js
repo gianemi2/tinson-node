@@ -242,6 +242,8 @@ const solveCompatibilityIssues = async function (entries) {
 
 const getDriveFileSize = async function (driveId) {
     return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`).then(res => {
-        return res.data.fileSize ? res.data.fileSize : 0;
+        return res.data.fileSize
+            ? parseInt(res.data.fileSize)
+            : 0;
     })
 }
