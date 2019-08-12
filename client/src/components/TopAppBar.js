@@ -44,10 +44,8 @@ class TopAppBar extends React.Component {
         if (!this.state.loggedin) {
             const data = await checkToken();
             if (data.success) {
-                alert('Loggedin');
                 this.setState({ loggedin: true });
             } else {
-                alert('Not loggedin');
                 this.setState({ loggedin: false });
             }
         }
