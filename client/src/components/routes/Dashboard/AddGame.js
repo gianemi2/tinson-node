@@ -56,7 +56,7 @@ export default class AddGame extends Component {
                     justify="flex-start"
                     alignItems="flex-end"
                 >
-                    <FormControl style={{ marginRight: 10 }}>
+                    <FormControl style={{ marginRight: 10, flex: 1 }}>
                         <TextField
                             name="gameLink"
                             label="Google Drive link"
@@ -66,7 +66,7 @@ export default class AddGame extends Component {
                             type="url"
                         />
                     </FormControl>
-                    <FormControl style={{ marginRight: 10 }}>
+                    <FormControl style={{ marginRight: 10, flex: 1 }}>
                         <TextField
                             name="gameName"
                             label="Google Drive name"
