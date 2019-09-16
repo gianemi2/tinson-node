@@ -116,6 +116,28 @@ app.get('/checkToken', withAuth, (req, res) => {
     res.status(200).json({ success: true, data: req.id });
 });
 
+app.get('/api/welcome-message', withAuth, async (req, res) => {
+    const entries = await checkIfUserExists(req.id);
+
+    entries.success
+        ? res.json({ success: true, message: 'Message loaded succesfully', data: entries.data })
+        : res.json({ success: false, message: "There's been an error", error: entries.data });
+})
+
+app.post('/api/welcome-message', withAuth, async (req, res) => {
+    const entries = await checkIfUserExists(req.id);
+    if (entries.success) {
+        // Get the string from POST request with success message in it
+        const newMessage = req.body.message;
+        const { success } = await updateEntry(req.id, newMessage, 'success');
+        if (success) {
+            res.json({ success: true, message: 'Success message update correctly!' });
+        } else {
+            res.json({ success: false, message: 'Something wrong happened!' })
+        }
+    }
+})
+
 // Route for add folders.
 app.post('/api/add-folder', withAuth, async (req, res) => {
     const entries = await checkIfUserExists(req.id);
@@ -133,7 +155,7 @@ app.post('/api/add-folder', withAuth, async (req, res) => {
         directoriesList.push(link);
 
         // Try to update
-        const { success } = await updateEntry(req.id, directoriesList, true);
+        const { success } = await updateEntry(req.id, directoriesList, 'directories');
         if (success) {
             res.json({ success: true, message: 'Games updated correctly!' })
         } else {
@@ -207,7 +229,7 @@ app.post('/api/gamelist', withAuth, async (req, res) => {
         contentToDelete = contentToDelete.filter((v, i) => !target.includes(i));
 
         // Try to update
-        const { success } = await updateEntry(req.id, contentToDelete, deleteFolder);
+        const { success } = await updateEntry(req.id, contentToDelete, toDelete);
         if (success) {
             res.json({ success: true });
         } else {
@@ -225,7 +247,7 @@ app.get('/v1/:userid', async (req, res) => {
         const forTinfoil = {
             files: response.data.files,
             directories: response.data.directories,
-            success: "Thanks for using Tinson! For every issue please report it in issues tab in Github (github.com/gianemi2/tinson-node)"
+            success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`
         }
         res.json(forTinfoil);
     } else {
@@ -262,10 +284,8 @@ const checkIfUserExists = (userID) => {
     })
 }
 
-const updateEntry = function (base64name, files, isFolder = false) {
-    const update = isFolder
-        ? { $set: { "directories": files } }
-        : { $set: { "files": files } };
+const updateEntry = function (base64name, files, target = 'files') {
+    const update = { $set: { [target]: files } };
 
     return new Promise((resolve, reject) => {
         Tinson.updateOne({ "name": base64name }, update)

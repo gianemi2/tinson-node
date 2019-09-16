@@ -11,7 +11,7 @@ export default class AddFolder extends Component {
             dirlink: ''
         }
 
-        this.props.isOnBeta(true)
+        this.props.isOnBeta(false)
     }
 
     handleChange = ({ target }) => {
@@ -40,7 +40,7 @@ export default class AddFolder extends Component {
                     justify="flex-start"
                     alignItems="flex-end"
                 >
-                    <FormControl style={{ marginRight: 10 }}>
+                    <FormControl style={{ marginRight: 10, flex: 1 }}>
                         <TextField
                             name="dirlink"
                             label="G.Drive folder link"
@@ -50,7 +50,7 @@ export default class AddFolder extends Component {
                             type="url"
                         />
                     </FormControl>
-                    <FormControl style={{ marginRight: 10 }}>
+                    <FormControl style={{ marginRight: 10, flex: 1 }}>
                         <TextField
                             name="dirname"
                             label="G.Drive folder name"

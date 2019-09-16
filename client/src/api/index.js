@@ -48,6 +48,28 @@ export const addGameToList = async (gid, gname) => {
     return data;
 }
 
+export const fetchSuccessMessage = async () => {
+    const { data } = await axios.get('/api/welcome-message', {
+        headers: {
+            'Authorization': sessionStorage.getItem('_id')
+        }
+    })
+    return data;
+}
+
+export const setSuccessMessage = async (text) => {
+    const { data } = await axios.post('/api/welcome-message',
+        {
+            message: text
+        },
+        {
+            headers: {
+                'Authorization': sessionStorage.getItem('_id')
+            }
+        })
+    return data;
+}
+
 export const addFolderToList = async (dirlink, dirname) => {
     const { data } = await axios.post('/api/add-folder',
         {
