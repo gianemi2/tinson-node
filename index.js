@@ -179,10 +179,11 @@ app.post('/api/add-game', withAuth, async (req, res) => {
         }).replace(/\s/g, '');
         // Retrieve file size using gDrive API
         let size = await getDriveFileSize(req.body.gid);
+        let ext = await getDriveFileExtension(req.body.gid) || 'nsp';
 
         const game = {
             // Mount link with name
-            url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.nsp`,
+            url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.${ext}`,
             size: size
         }
         // Push it to array
@@ -322,10 +323,23 @@ const solveCompatibilityIssues = async function (entries) {
         })
 }
 
+const getDriveFileExtension = async function (driveId) {
+    return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`)
+        .then(response => {
+            if (response) {
+                return response.data.fileExtension
+            }
+        })
+        .catch(error => {
+            return 0;
+        })
+}
+
 const getDriveFileSize = async function (driveId) {
     return axios.get(`https://content.googleapis.com/drive/v2/files/${driveId}?key=${process.env.GOOGLE_API}`)
         .then(response => {
             if (response) {
+                console.log(response)
                 return response.data.fileSize
                     ? parseInt(response.data.fileSize)
                     : 0;
