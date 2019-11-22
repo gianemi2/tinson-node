@@ -29,6 +29,14 @@ Well it's pretty easy. There're three steps in total to follow.
 
 Tinfoil will auto upload the file if you'll insert new games in the list. So the 3rd step is required just for the first time.
 
+## Donations
+
+Please, if you're using and enjoing Tinson considering to leave a little donation for maintain Heroku server up.
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L318MYF)
+
+Thanks a lot ❤️
+
 ### Prerequisites
 
 The only prerequisites are:
