@@ -11,3 +11,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.ko-fi_button {
+  background-color: #2DADE1;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  display: inline-flex;
+  padding: 0 12px;
+  margin-right: 25px;
+  height: 30px;
+  align-items: center;
+}
+
+.ko-fi_button img {
+  max-height: 100%;
+}
+
+@media(max-width: 992px) {
+  .footer {
+    flex-direction: column;
+  }
+
+  .buttons-container {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .ko-fi_button {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
+    margin-right: 0;
+  }
+
+  .buttons-container>* {
+    margin-bottom: 5px;
+  }
+}
