@@ -253,7 +253,8 @@ app.get('/v1/:userid', async (req, res) => {
         const forTinfoil = {
             files: response.data.files,
             directories: response.data.directories,
-            success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`
+            success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`,
+            googleApiKey: process.env.GOOGLE_API_PUBLIC
         }
         res.json(forTinfoil);
     } else {
