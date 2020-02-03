@@ -143,6 +143,7 @@ app.post('/api/add-folder', withAuth, async (req, res) => {
     const entries = await checkIfUserExists(req.id);
 
     if (entries.success) {
+        const tinfoilLegacyMode = req.body.legacy ? true : false;
         // Retrieve list or initiate empty array
         const directoriesList = entries.data.directories ? entries.data.directories : [];
         // Flush strange chars on name
@@ -150,7 +151,10 @@ app.post('/api/add-folder', withAuth, async (req, res) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
         // Mount link with name
-        const link = `${req.body.dirlink}#${dirname}`;
+        const dirlink = tinfoilLegacyMode
+            ? 'https://drive.google.com/drive/folders/'
+            : 'gdrive:/'
+        const link = `${dirlink}${req.body.dirlink}#${dirname}`;
         // Push it to array
         directoriesList.push(link);
 

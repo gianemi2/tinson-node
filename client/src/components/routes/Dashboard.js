@@ -64,7 +64,7 @@ export default class Dashboard extends Component {
                         label={
                             this.state.legacyMode
                                 ? 'Deactivate Tinfoil <8.00 compatibility'
-                                : 'Activate Tinfoil 8.00 compatibility (please consider upgrade Tinfoil to > 8.00)'
+                                : 'Activate Tinfoil 8.00 compatibility'
                         }
                     />
                     {
@@ -98,6 +98,9 @@ export default class Dashboard extends Component {
     }
 
     handleLegacyChange() {
+        if (this.state.legacyMode != true) {
+            alert('please consider upgrade Tinfoil to > 8.00')
+        }
         this.setState(
             {
                 legacyMode: !this.state.legacyMode

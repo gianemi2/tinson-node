@@ -18,10 +18,28 @@ export default class AddFolder extends Component {
         this.setState({ [target.name]: target.value });
     }
 
+    grepDriveId(driveLink) {
+        // Tentativo #1 controllo in GET se c'è l'id
+        const url = new URL(driveLink);
+        let id;
+        if (url.searchParams.get('id')) {
+            id = url.searchParams.get('id');
+        } else {
+            // Tentativo fallito. 
+            // Tentativo #2: controllo manuale.
+            const paths = url.pathname.split('/');
+            id = paths.reduce((prev, curr) => {
+                return prev.length > curr.length ? prev : curr;
+            })
+        }
+        return id;
+    }
+
     handleSubmit = async (e) => {
         e.preventDefault();
         if (this.state.dirlink && this.state.dirname) {
-            const data = await addFolderToList(this.state.dirlink, this.state.dirname);
+            const id = this.grepDriveId(this.state.dirlink);
+            const data = await addFolderToList(id, this.state.dirname, this.props.legacy);
             if (data.success) {
                 this.setState({
                     dirlink: '',
