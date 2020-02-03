@@ -34,11 +34,12 @@ export const loginUser = async (name, password) => {
         });
 }
 
-export const addGameToList = async (gid, gname) => {
+export const addGameToList = async (gid, gname, legacy) => {
     const { data } = await axios.post('/api/add-game',
         {
             gid: gid,
-            gname: gname
+            gname: gname,
+            legacy: legacy
         },
         {
             headers: {
@@ -70,11 +71,12 @@ export const setSuccessMessage = async (text) => {
     return data;
 }
 
-export const addFolderToList = async (dirlink, dirname) => {
+export const addFolderToList = async (gid, dirname, legacy) => {
     const { data } = await axios.post('/api/add-folder',
         {
-            dirlink: dirlink,
-            dirname: dirname
+            dirlink: gid,
+            dirname: dirname,
+            legacy: legacy
         },
         {
             headers: {

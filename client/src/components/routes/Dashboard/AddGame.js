@@ -21,7 +21,7 @@ export default class AddGame extends Component {
         e.preventDefault();
         if (this.state.gameLink && this.state.gameName) {
             let id = this.grepDriveId(this.state.gameLink);
-            const data = await addGameToList(id, this.state.gameName);
+            const data = await addGameToList(id, this.state.gameName, this.props.legacy);
             if (data.success) {
                 this.setState({
                     gameLink: '',
@@ -48,6 +48,7 @@ export default class AddGame extends Component {
         }
         return id;
     }
+
     render() {
         return (
             <form onSubmit={this.handleSubmit}>

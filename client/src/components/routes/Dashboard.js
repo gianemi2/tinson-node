@@ -17,7 +17,8 @@ export default class Dashboard extends Component {
             content: [],
             folderMode: false,
             beta: false,
-            userID: ''
+            userID: '',
+            legacyMode: false
         }
     }
 
@@ -30,7 +31,7 @@ export default class Dashboard extends Component {
                 </p>
                 <div style={{
                     maxWidth: "100%",
-                    width: 600
+                    width: 715
                 }}>
                     <SetSuccessMessage />
                     <FormControlLabel
@@ -49,6 +50,23 @@ export default class Dashboard extends Component {
                                 : 'Activate folder mode'
                         }
                     />
+                    <br />
+                    <FormControlLabel
+                        style={{ marginTop: 20, marginBottom: -15 }}
+                        control={
+                            <Switch
+                                checked={this.state.legacyMode}
+                                onChange={() => this.handleLegacyChange()}
+                                value="checkedA"
+                                inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            />
+                        }
+                        label={
+                            this.state.legacyMode
+                                ? 'Deactivate Tinfoil <8.00 compatibility'
+                                : 'Activate Tinfoil 8.00 compatibility'
+                        }
+                    />
                     {
                         this.state.beta
                             ? <Chip style={{ fontSize: 16, marginLeft: 15 }} label="Beta feature" color="secondary" />
@@ -56,8 +74,14 @@ export default class Dashboard extends Component {
                     }
                     {
                         this.state.folderMode
-                            ? <AddFolder isOnBeta={(beta) => this.setBetaStatus(beta)} onFolderUpdated={this.fetchGames}></AddFolder>
-                            : <AddGame isOnBeta={(beta) => this.setBetaStatus(beta)} onGameUpdated={this.fetchGames}></AddGame>
+                            ? <AddFolder
+                                isOnBeta={(beta) => this.setBetaStatus(beta)}
+                                onFolderUpdated={this.fetchGames}
+                                legacy={this.state.legacyMode} />
+                            : <AddGame
+                                isOnBeta={(beta) => this.setBetaStatus(beta)}
+                                onGameUpdated={this.fetchGames}
+                                legacy={this.state.legacyMode} />
                     }
                     <GameList
                         onTriggerDelete={(index) => this.deleteEntries(index)}
@@ -65,12 +89,23 @@ export default class Dashboard extends Component {
                         loadingFolders={this.state.folderMode}></GameList>
                 </div>
                 <Informations id={this.state.userID}></Informations>
-            </React.Fragment>
+            </React.Fragment >
         )
     }
 
     setBetaStatus(betaStatus) {
         this.setState({ beta: betaStatus });
+    }
+
+    handleLegacyChange() {
+        if (this.state.legacyMode != true) {
+            alert('please consider upgrade Tinfoil to > 8.00')
+        }
+        this.setState(
+            {
+                legacyMode: !this.state.legacyMode
+            }
+        )
     }
 
     handleChangeMode() {

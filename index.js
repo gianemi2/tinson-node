@@ -143,6 +143,7 @@ app.post('/api/add-folder', withAuth, async (req, res) => {
     const entries = await checkIfUserExists(req.id);
 
     if (entries.success) {
+        const tinfoilLegacyMode = req.body.legacy ? true : false;
         // Retrieve list or initiate empty array
         const directoriesList = entries.data.directories ? entries.data.directories : [];
         // Flush strange chars on name
@@ -150,7 +151,10 @@ app.post('/api/add-folder', withAuth, async (req, res) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
         // Mount link with name
-        const link = `${req.body.dirlink}#${dirname}`;
+        const dirlink = tinfoilLegacyMode
+            ? 'https://drive.google.com/drive/folders/'
+            : 'gdrive:/'
+        const link = `${dirlink}${req.body.dirlink}#${dirname}`;
         // Push it to array
         directoriesList.push(link);
 
@@ -171,19 +175,24 @@ app.post('/api/add-game', withAuth, async (req, res) => {
     const entries = await checkIfUserExists(req.id);
 
     if (entries.success) {
+        const tinfoilLegacyMode = req.body.legacy ? true : false;
         // Retrieve list or initiate empty array
         const gameList = entries.data.files ? entries.data.files : [];
         // Flush strange chars on name
         const gname = req.body.gname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
+
         // Retrieve file size using gDrive API
         let size = await getDriveFileSize(req.body.gid);
         let ext = await getDriveFileExtension(req.body.gid) || 'nsp';
+        let base_api = tinfoilLegacyMode
+            ? 'https://docs.google.com/uc?export=download&id='
+            : 'gdrive:/'
 
         const game = {
             // Mount link with name
-            url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.${ext}`,
+            url: `${base_api}${req.body.gid}#${gname}.${ext}`,
             size: size
         }
         // Push it to array
@@ -248,7 +257,8 @@ app.get('/v1/:userid', async (req, res) => {
         const forTinfoil = {
             files: response.data.files,
             directories: response.data.directories,
-            success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`
+            success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`,
+            googleApiKey: process.env.GOOGLE_API_PUBLIC
         }
         res.json(forTinfoil);
     } else {
