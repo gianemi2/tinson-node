@@ -171,19 +171,24 @@ app.post('/api/add-game', withAuth, async (req, res) => {
     const entries = await checkIfUserExists(req.id);
 
     if (entries.success) {
+        const tinfoilLegacyMode = req.body.legacy ? true : false;
         // Retrieve list or initiate empty array
         const gameList = entries.data.files ? entries.data.files : [];
         // Flush strange chars on name
         const gname = req.body.gname.replace(/\w+/g, (txt) => {
             return txt.charAt(0).toUpperCase() + txt.substr(1);
         }).replace(/\s/g, '');
+
         // Retrieve file size using gDrive API
         let size = await getDriveFileSize(req.body.gid);
         let ext = await getDriveFileExtension(req.body.gid) || 'nsp';
+        let base_api = tinfoilLegacyMode
+            ? 'https://docs.google.com/uc?export=download&id='
+            : 'gdrive:/'
 
         const game = {
             // Mount link with name
-            url: `https://docs.google.com/uc?export=download&id=${req.body.gid}#${gname}.${ext}`,
+            url: `${base_api}${req.body.gid}#${gname}.${ext}`,
             size: size
         }
         // Push it to array

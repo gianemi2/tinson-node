@@ -34,11 +34,12 @@ export const loginUser = async (name, password) => {
         });
 }
 
-export const addGameToList = async (gid, gname) => {
+export const addGameToList = async (gid, gname, legacy) => {
     const { data } = await axios.post('/api/add-game',
         {
             gid: gid,
-            gname: gname
+            gname: gname,
+            legacy: legacy
         },
         {
             headers: {
