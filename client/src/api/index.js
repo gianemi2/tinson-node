@@ -14,6 +14,13 @@ export const checkToken = async () => {
         })
 }
 
+export const getRepoURL = async (fullURL) => {
+    const { data } = await axios.post('/api/repoURL', {
+        fullURL
+    })
+    return data.data
+}
+
 export const registerUser = async (name, password) => {
     const { data } = await axios.post('/api/register', {
         name: name,
