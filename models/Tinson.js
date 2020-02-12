@@ -17,7 +17,6 @@ const TinsonSchema = new mongoose.Schema({
         ]
     },
     directories: { type: Array },
-    repoURL: String,
     success: { type: String, default: "Thanks for using Tinson! For every issue please report it in issues tab in Github (github.com/gianemi2/tinson-node)" }
 });
 
