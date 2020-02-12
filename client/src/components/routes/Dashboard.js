@@ -65,7 +65,7 @@ export default class Dashboard extends Component {
                         label={
                             this.state.legacyMode
                                 ? 'Deactivate Tinfoil <8.00 compatibility'
-                                : 'Activate Tinfoil 8.00 compatibility'
+                                : 'Activate Tinfoil <8.00 compatibility'
                         }
                     />
                     {
