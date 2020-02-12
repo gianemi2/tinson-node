@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { FormControlLabel, Switch, Chip } from '@material-ui/core'
 
-import { fetchGameList, deleteEntriesFromList, checkToken, getRepoURL } from '../../api'
+import { fetchGameList, deleteEntriesFromList, checkToken } from '../../api'
 import AddGame from './Dashboard/AddGame'
 import AddFolder from './Dashboard/AddFolder'
 import GameList from './Dashboard/GameList'
@@ -18,8 +18,7 @@ export default class Dashboard extends Component {
             folderMode: false,
             beta: false,
             userID: '',
-            legacyMode: false,
-            repoURL: `${window.location.origin}/v1/`
+            legacyMode: false
         }
     }
 
@@ -65,7 +64,7 @@ export default class Dashboard extends Component {
                         label={
                             this.state.legacyMode
                                 ? 'Deactivate Tinfoil <8.00 compatibility'
-                                : 'Activate Tinfoil <8.00 compatibility'
+                                : 'Activate Tinfoil 8.00 compatibility'
                         }
                     />
                     {
@@ -89,7 +88,7 @@ export default class Dashboard extends Component {
                         games={this.state.content}
                         loadingFolders={this.state.folderMode}></GameList>
                 </div>
-                <Informations repoURL={this.state.repoURL} id={this.state.userID}></Informations>
+                <Informations id={this.state.userID}></Informations>
             </React.Fragment >
         )
     }
@@ -99,7 +98,7 @@ export default class Dashboard extends Component {
     }
 
     handleLegacyChange() {
-        if (this.state.legacyMode !== true) {
+        if (this.state.legacyMode != true) {
             alert('please consider upgrade Tinfoil to > 8.00')
         }
         this.setState(
@@ -130,10 +129,6 @@ export default class Dashboard extends Component {
     componentDidMount() {
         this.fetchGames();
         checkToken().then(res => this.setState({ userID: res.id }));
-        if (this.state.repoURL.indexOf('localhost') === -1) {
-            getRepoURL(this.state.repoURL)
-                .then(res => this.setState({ repoURL: res }))
-        }
     }
 
     fetchGames = async () => {

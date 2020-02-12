@@ -17,7 +17,6 @@ const cookieParser = require('cookie-parser');
 const withAuth = require('./middleware');
 const Hashkit = require("hashkit");
 const secret = process.env.SECRET;
-const { BITLY_TOKEN } = process.env;
 
 const hashkit = new Hashkit();
 
@@ -136,24 +135,6 @@ app.post('/api/welcome-message', withAuth, async (req, res) => {
         } else {
             res.json({ success: false, message: 'Something wrong happened!' })
         }
-    }
-})
-
-app.post('/api/repoURL', withAuth, async (req, res) => {
-    const hasURL = await hasShortenURL(req.id)
-    if (hasURL) {
-        res.json({ success: true, updated: false, data: hasURL })
-    } else {
-        const fullURL = req.body.fullURL
-        createShortenURL(fullURL + req.id)
-            .then(response => {
-                const { link } = response
-                updateEntry(req.id, link, 'repoURL')
-                res.json({ success: true, updated: true, data: link })
-            })
-            .catch(error => {
-                res.json({ success: false, data: error })
-            })
     }
 })
 
@@ -377,37 +358,4 @@ const getDriveFileSize = async function (driveId) {
             return 0;
         })
 
-}
-
-const hasShortenURL = async (userID) => {
-    const { data } = await checkIfUserExists(userID)
-    if (data.repoURL) {
-        if (data.repoURL.length > 0) {
-            // do nothing
-            return data.repoURL
-        }
-    } else {
-        return false
-    }
-}
-
-const createShortenURL = async (url) => {
-    const config = {
-        headers: {
-            'Authorization': `Bearer ${BITLY_TOKEN}`,
-            'Content-Type': 'application/json'
-        }
-    }
-    const body = {
-        'long_url': url
-    }
-    return new Promise((resolve, reject) => {
-        axios
-            .post('https://api-ssl.bitly.com/v4/shorten', body, config)
-            .then(({ data }) => {
-                console.log(data)
-                resolve(data)
-            })
-            .catch(err => reject(err))
-    })
 }
