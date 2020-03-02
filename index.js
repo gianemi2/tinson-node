@@ -188,7 +188,7 @@ app.post('/api/add-game', withAuth, async (req, res) => {
         let ext = await getDriveFileExtension(req.body.gid) || 'nsp';
         let base_api = tinfoilLegacyMode
             ? 'https://docs.google.com/uc?export=download&id='
-            : 'gdrive:/'
+            : 'gdrive:'
 
         const game = {
             // Mount link with name
