@@ -2,6 +2,8 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
+const tmp = require('tmp');
+const fs = require('fs');
 
 // Retrieve all .env configurations
 require('dotenv').config();
@@ -260,7 +262,9 @@ app.get('/v1/:userid', async (req, res) => {
             success: `${response.data.success} REMEMBER THAT TINSON AND TINFOIL IS FREE AND ALWAYS WILL BE. PLEASE SEND A MAIL TO GIANEMI2@GMAIL.COM IF SOMEONE HAS SOLD THIS TO YOU.`,
             googleApiKey: process.env.GOOGLE_API_PUBLIC
         }
-        res.json(forTinfoil);
+        const tinfoilFilePath = createTinfoilJSON(forTinfoil)
+        console.log(tinfoilFilePath)
+        res.download(tinfoilFilePath);
     } else {
         res.json({ success: "Hi! This message means that Tinson is setup correctly but the no users has been found with the current ID." })
     }
@@ -358,4 +362,16 @@ const getDriveFileSize = async function (driveId) {
             return 0;
         })
 
+}
+
+const createTinfoilJSON = (tinfoilJSON) => {
+    try {
+        const temporaryFile = tmp.fileSync({ postfix: '.json' })
+        if (temporaryFile) {
+            fs.writeFileSync(temporaryFile.name, JSON.stringify(tinfoilJSON))
+            return temporaryFile.name
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }
